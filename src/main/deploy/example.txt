@@ -1,0 +1,38 @@
+Files placed in this directory will be deployed to the RoboRIO into the
+'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
+to get a proper path relative to the deploy directory.
+
+package frc.robot;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import com.revrobotics.CANSparkMax;             
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+public class Robot extends TimedRobot {
+    private DifferentialDrive driveTrain;
+   	private Joystick driveStickLeft;
+   	private Joystick driveStickRight;
+
+    @Override
+    public void robotInit() {
+        CANSparkMax m_rearLeft = new CANSparkMax(1, MotorType.kBrushless);
+        CANSparkMax m_frontLeft = new CANSparkMax(2, MotorType.kBrushless);
+        SpeedControllerGroup leftmotors = new SpeedControllerGroup(m_rearLeft, m_frontLeft);
+        CANSparkMax m_rearRight = new CANSparkMax(3, MotorType.kBrushless);
+        CANSparkMax m_frontRight = new CANSparkMax(4, MotorType.kBrushless);
+        SpeedControllerGroup rightmotors = new SpeedControllerGroup(m_rearRight, m_frontRight);
+        driveTrain = new DifferentialDrive(leftmotors, rightmotors);
+
+        driveStickLeft = new Joystick(0);
+        driveStickRight = new Joystick(1);
+	}
+
+    @Override
+	public void teleopPeriodic() {
+		double driveY = driveStickLeft.getY()* ((driveStickLeft.getThrottle() - 1.05) / 2);
+		double driveX = driveStickRight.getZ() * ((driveStickRight.getThrottle() - 1.05) / -2);
+		driveTrain.curvatureDrive(driveY, driveX, true);
+	}
+}
