@@ -8,8 +8,8 @@ import org.longmetal.DriveTrain;
 import org.longmetal.Constants;
 
 public class Robot extends TimedRobot {
-    private final static String kBRANCH = "master";
-    private final static String kCOMMIT = "1fcc3cd";
+    private final static String kBRANCH = "arduino-communication";
+    private final static String kCOMMIT = "e9c4b24";
 
     Input input;
     DriveTrain driveTrain;
