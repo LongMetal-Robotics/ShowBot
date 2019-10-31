@@ -7,7 +7,7 @@ public class Arduino {
     byte[] toSend = new byte[1];
     boolean ready = false;
 
-    public void initialize() {
+    public Arduino() {
         i2c = new I2C(I2C.Port.kOnboard, Constants.kI2C_ADDRESS);
         ready = true;
     }
