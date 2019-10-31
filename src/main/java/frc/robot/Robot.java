@@ -8,13 +8,18 @@ import org.longmetal.DriveTrain;
 import org.longmetal.Constants;
 
 public class Robot extends TimedRobot {
-    private Input input;
-    private DriveTrain driveTrain;
-    SendableChooser chooserQuinnDrive;
+    private final static String kBRANCH = "master";
+    private final static String kCOMMIT = "1fcc3cd";
+
+    Input input;
+    DriveTrain driveTrain;
+    SendableChooser<Boolean> chooserQuinnDrive;
     boolean lastQuinnDrive = false;
 
     @Override
     public void robotInit() {
+        System.out.println("Commit " + kCOMMIT + " or later (branch '" + kBRANCH + "')");
+
         input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
         driveTrain = new DriveTrain();
         chooserQuinnDrive = new SendableChooser<>();
