@@ -52,7 +52,6 @@ public class DriveTrain {
         if (reverseDrive) {
             // Reverse drive values
             driveX *= -1;
-            driveZ *= -1;
         }
 
         driveTrain.curvatureDrive(driveX, driveZ, true);    // Drive
