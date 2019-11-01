@@ -8,8 +8,14 @@ public class Arduino {
     boolean ready = false;
 
     public Arduino() {
-        i2c = new I2C(I2C.Port.kOnboard, Constants.kI2C_ADDRESS);
-        ready = true;
+        try {
+            i2c = new I2C(I2C.Port.kOnboard, Constants.kI2C_ADDRESS);
+            ready = true;
+        } catch (Exception e) {
+            System.out.println("[I2C:INIT]\tSomething went wrong with I2C initialization. Stack trace and message are below");
+            System.out.println(e.getLocalizedMessage());
+            e.printStackTrace();
+        }
     }
 
     public void sendStatus(Status status) {
