@@ -17,5 +17,5 @@ public class Constants {
     public static final int kRIGHT_STICK = 1;
 
     // Arduino
-    public static final int kI2C_ADDRESS = 168; // This is address 84 because the RIO is weird (it shifts the address 1 bit)
+    public static final int kSERIAL_BAUD_RATE = 9600;
 }

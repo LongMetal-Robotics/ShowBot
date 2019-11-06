@@ -3,16 +3,15 @@
  * SDA/SCL - Connected to RIO through pull-up resistors
 */
 #include <Adafruit_NeoPixel.h>
-#include <Wire.h>
 
 #define STRIP_PIN 13
 #define LED_COUNT 16
 
 Adafruit_NeoPixel strip(LED_COUNT, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
-#define I2C_ADDR 84
+#define BAUD_RATE 9600
 
-bool disabled = false;
+bool disabled = true;
 char stat = 'n';
 
 #define PULSE_TIME 500
@@ -22,14 +21,19 @@ char stat = 'n';
 #define RSL_B 0
 
 void setup() {
-  Wire.begin(I2C_ADDR);
-  Wire.onReceive(receiveEvent);
+  Serial.begin(BAUD_RATE);
 
   strip.begin();
   strip.show();
 }
 
 void loop() {
+  receiveEvent();
+
+  for (int i = 0; i < LED_COUNT; i++) {
+    strip.setPixelColor(i, 0, 0, 0);
+  }
+
   if (disabled) {
     for (int i = 0; i < LED_COUNT; i++) {
       strip.setPixelColor(i, RSL_R, RSL_G, RSL_B);
@@ -61,28 +65,32 @@ void loop() {
   strip.show();
 }
 
-void receiveEvent(int howMany) {
-  while (Wire.available()) {
-    char c = Wire.read();
+void receiveEvent() {
+  while (Serial.available() > 0) {
+    char c = Serial.read();
     switch (c) {
-      case 69: // ENABLED
+      case 69: // 'E'NABLED
         disabled = false;
         break;
 
-      case 68: // DISABLED
+      case 68: // 'D'ISABLED
         disabled = true;
         break;
 
-      case 70: // FORWARD
+      case 70: // 'F'ORWARD
         stat = 'f';
         break;
 
-      case 66: // BACKWARD
+      case 66: // 'B'ACKWARD
         stat = 'b';
         break;
 
-      case 83: // SHOOTING
+      case 83: // 'S'HOOTING
         stat = 's';
+        break;
+
+      default:
+        stat = 'n';
     }
   }
 }

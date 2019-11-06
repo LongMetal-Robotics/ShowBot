@@ -11,7 +11,7 @@ import org.longmetal.Arduino;
 
 public class Robot extends TimedRobot {
     private final static String kBRANCH = "arduino-communication";
-    private final static String kCOMMIT = "f44a971";
+    private final static String kCOMMIT = "366306f";
 
     Input input;
     DriveTrain driveTrain;
