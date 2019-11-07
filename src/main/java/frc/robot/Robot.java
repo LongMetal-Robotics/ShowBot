@@ -57,8 +57,16 @@ public class Robot extends TimedRobot {
         if (forwardDrive && forwardDrive != lastForwardDrive && !reverseDrive) { // If it is pressed and it changed and both aren't pressed
             // Set forward drive
             driveTrain.setReverseDrive(false);
+		public void disabledPeriodic() {
+        	if (status.isReady()) {
+          	  status.sendStatus(Status.FORWARD); // HEY! IF SOMETHINGS NOT WORKING ITS PROBABLY THIS
+        }
         }
         lastForwardDrive = forwardDrive;
+		public void disabledPeriodic() {
+        if (status.isReady()) {
+            status.sendStatus(Status.BACKWARD);
+        }
 
         if (reverseDrive && reverseDrive != lastReverseDrive && !forwardDrive) { // If it is pressed and it changed and both aren't pressed
             // Set reverse drive
