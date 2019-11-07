@@ -15,7 +15,9 @@ public class Constants {
     // Input
     public static final int kLEFT_STICK = 0;
     public static final int kRIGHT_STICK = 1;
-
-    // Arduino
+    public static final int kFORWARD_BUTTON = 5;
+    public static final int kREVERSE_BUTTON = 3;
+    
+    // Communication
     public static final int kSERIAL_BAUD_RATE = 9600;
 }

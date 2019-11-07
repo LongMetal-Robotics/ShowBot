@@ -10,17 +10,22 @@ import org.longmetal.Constants;
 import org.longmetal.Arduino;
 
 public class Robot extends TimedRobot {
-    private final static String kBRANCH = "arduino-communication";
-    private final static String kCOMMIT = "366306f";
+    private static final String DEPRECATION = "deprecation";
+    private final static String kBRANCH = "master";
+    private final static String kCOMMIT = "c64c2f1";
 
     Input input;
     DriveTrain driveTrain;
     Arduino status;
 
     SendableChooser<Boolean> chooserQuinnDrive;
+
     boolean lastQuinnDrive = false;
+    boolean lastForwardDrive = false;
+    boolean lastReverseDrive = false;
 
     @Override
+    @SuppressWarnings(DEPRECATION)
     public void robotInit() {
         System.out.println("Commit " + kCOMMIT + " or later (branch '" + kBRANCH + "')");
 
@@ -43,6 +48,25 @@ public class Robot extends TimedRobot {
             input.setQuinnDrive(quinnDrive);
         }
         lastQuinnDrive = quinnDrive;
+
+        // Reverse Drive mode
+
+        boolean forwardDrive = input.forwardStick.getRawButtonPressed(Constants.kFORWARD_BUTTON);
+        boolean reverseDrive = input.forwardStick.getRawButton(Constants.kREVERSE_BUTTON);
+
+        if (forwardDrive && forwardDrive != lastForwardDrive && !reverseDrive) { // If it is pressed and it changed and both aren't pressed
+            // Set forward drive
+            driveTrain.setReverseDrive(false);
+        }
+        lastForwardDrive = forwardDrive;
+
+        if (reverseDrive && reverseDrive != lastReverseDrive && !forwardDrive) { // If it is pressed and it changed and both aren't pressed
+            // Set reverse drive
+            driveTrain.setReverseDrive(true);
+        }
+        lastReverseDrive = reverseDrive;
+
+        SmartDashboard.putBoolean("Reverse Drive", driveTrain.getReverseDrive());
     }
 
     @Override
