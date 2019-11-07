@@ -57,20 +57,18 @@ public class Robot extends TimedRobot {
         if (forwardDrive && forwardDrive != lastForwardDrive && !reverseDrive) { // If it is pressed and it changed and both aren't pressed
             // Set forward drive
             driveTrain.setReverseDrive(false);
-		public void disabledPeriodic() {
-        	if (status.isReady()) {
-          	  status.sendStatus(Status.FORWARD); // HEY! IF SOMETHINGS NOT WORKING ITS PROBABLY THIS
-        }
+	    if (status.isReady()) {
+	        status.sendStatus(Status.FORWARD); // HEY! IF SOMETHINGS NOT WORKING ITS PROBABLY THIS
+	    }
         }
         lastForwardDrive = forwardDrive;
-		public void disabledPeriodic() {
-        if (status.isReady()) {
-            status.sendStatus(Status.BACKWARD);
-        }
 
         if (reverseDrive && reverseDrive != lastReverseDrive && !forwardDrive) { // If it is pressed and it changed and both aren't pressed
             // Set reverse drive
             driveTrain.setReverseDrive(true);
+	    if (status.isReady()) {
+                status.sendStatus(Status.BACKWARD);
+            }
         }
         lastReverseDrive = reverseDrive;
 
@@ -85,7 +83,7 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-	public void teleopPeriodic() {
+    public void teleopPeriodic() {
         if (status.isReady()) {
             status.sendStatus(Status.ENABLED);
         }
@@ -94,5 +92,5 @@ public class Robot extends TimedRobot {
             input.forwardStick.getThrottle(),
             input.turnStick.getTwist(),
             input.turnStick.getThrottle());
-	}
+    }
 }
