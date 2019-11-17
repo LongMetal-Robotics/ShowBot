@@ -14,5 +14,14 @@ public class Shooter
         shooterR = new Spark(2);
         singulator = new Spark(3);
     }
+    public void setSingFreq(double singNum)
+    {
+        singulator.set(singNum);
+    }
+    public void setShootSpeed(double shootSpeed)
+    {
+        shooterL.set(shootSpeed);
+        shooterR.set(shootSpeed);
+    }
    
 }
