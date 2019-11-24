@@ -23,5 +23,15 @@ public class Shooter
         shooterL.set(shootSpeed);
         shooterR.set(shootSpeed);
     }
+    
    
 }
+//work on later
+public void teleopPeriodic()
+    {
+        if (buttonLBPressed && !forwardLimitSwitch.get()) // If the forward limit switch is pressed, we want to keep the values between -1 and 0
+            shooter.setAngle(ControlMode.PercentOutput, 0.4);
+        else if(buttonLTPressed && !reverseLimitSwitch.get()) // If the reversed limit switch is pressed, we want to keep the values between 0 and 1
+            shooter.setAngle(ControlMode.PercentOutput, -0.4);
+        shooter.setAngle(ControlMode.PercentOutput, 0.0);
+    }
