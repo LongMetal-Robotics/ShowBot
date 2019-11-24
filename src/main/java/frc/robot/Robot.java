@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Preferences;
 
 import org.longmetal.Arduino.Status;
 import org.longmetal.*;
@@ -19,9 +20,12 @@ public class Robot extends TimedRobot {
     Arduino status;
     Shooter shooter;
     Collector collector;
+    Preferences prefs;
 
     SendableChooser<Boolean> chooserQuinnDrive;
 
+    boolean preferenceShooter;
+    boolean preferenceManipulator;
     boolean lastQuinnDrive = false;
     boolean lastForwardDrive = false;
     boolean lastReverseDrive = false;
@@ -57,6 +61,7 @@ public class Robot extends TimedRobot {
         input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
         driveTrain = new DriveTrain();
         status = new Arduino();
+        prefs = Preferences.getInstance();
 
         shooter = new Shooter();
         collector = new Collector();
@@ -65,6 +70,10 @@ public class Robot extends TimedRobot {
         chooserQuinnDrive.addDefault("Disabled", false);
         chooserQuinnDrive.addObject("Enabled", true);
         SmartDashboard.putData("Quinn Drive Chooser", chooserQuinnDrive);
+
+        preferenceShooter = prefs.getBoolean("preferenceShooter", false);
+        preferenceManipulator = prefs.getBoolean("preferenceManipulator", false);
+        
     }
     
     @Override
