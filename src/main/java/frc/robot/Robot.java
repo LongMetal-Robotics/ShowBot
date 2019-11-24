@@ -8,11 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.longmetal.Input;
 import org.longmetal.Arduino.Status;
-import org.longmetal.DriveTrain;
-import org.longmetal.Constants;
-import org.longmetal.Arduino;
+import org.longmetal.*;
 
 public class Robot extends TimedRobot {
     private static final String DEPRECATION = "deprecation";
@@ -20,6 +17,8 @@ public class Robot extends TimedRobot {
     Input input;
     DriveTrain driveTrain;
     Arduino status;
+    Shooter shooter;
+    Collector collector;
 
     SendableChooser<Boolean> chooserQuinnDrive;
 
@@ -58,6 +57,9 @@ public class Robot extends TimedRobot {
         input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
         driveTrain = new DriveTrain();
         status = new Arduino();
+
+        shooter = new Shooter();
+        collector = new Collector();
 
         chooserQuinnDrive = new SendableChooser<>();
         chooserQuinnDrive.addDefault("Disabled", false);
