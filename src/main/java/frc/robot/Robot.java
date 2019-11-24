@@ -71,9 +71,12 @@ public class Robot extends TimedRobot {
         chooserQuinnDrive.addObject("Enabled", true);
         SmartDashboard.putData("Quinn Drive Chooser", chooserQuinnDrive);
 
+        //here are the booleans for if the shooter and manipulator should be running from outset
+        //the backup for if something isn't working right is false
+        
         preferenceShooter = prefs.getBoolean("preferenceShooter", false);
         preferenceManipulator = prefs.getBoolean("preferenceManipulator", false);
-        
+
     }
     
     @Override
