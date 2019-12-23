@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
 public class Arduino {
-    SerialPort port;
-    byte[] toSend = new byte[1];
-    boolean ready = false;
+    private SerialPort port;
+    private byte[] toSend = new byte[1];
+    private boolean ready = false;
 
     public Arduino() {
         try {

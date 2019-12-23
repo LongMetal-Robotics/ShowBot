@@ -7,32 +7,33 @@ public class Constants {
     public static final double kTHROTTLE_SHIFT = 1.05;
     public static final double kCURVE_MODIFIER = -0.25;
 
-    public static final int kREAR_LEFT = 2;
-    public static final int kFRONT_LEFT = 1;
-    public static final int kREAR_RIGHT = 4;
-    public static final int kFRONT_RIGHT = 3;
+    public static final int kP_REAR_LEFT = 2;
+    public static final int kP_FRONT_LEFT = 1;
+    public static final int kP_REAR_RIGHT = 4;
+    public static final int kP_FRONT_RIGHT = 3;
 
     // Input
-    public static final int kLEFT_STICK = 0;
-    public static final int kRIGHT_STICK = 1;
+    public static final int kP_LEFT_STICK = 0;
+    public static final int kP_RIGHT_STICK = 1;
     public static final int kFORWARD_BUTTON = 5;
     public static final int kREVERSE_BUTTON = 3;
+    public static final int kP_GAMEPAD = 2;
     
     // Communication
     public static final int kSERIAL_BAUD_RATE = 9600;
 
     // Shooter
     public static final int kANGLE = 5;
-    public static final int kL_SHOOTER = 1;
-    public static final int kR_SHOOTER = 2;
+    public static final int kP_LSHOOTER = 1;
+    public static final int kP_RSHOOTER = 2;
     public static final double kSHOOTER_MIN = 0.1;
     public static final double kSHOOTER_MAX = 0.75;
-    public static final int kSINGULATOR = 3;
+    public static final int kP_SINGULATOR = 3;
     public static final double kSINGULATOR_MIN = 0;
     public static final double kSINGULATOR_MAX = 0.5;
 
     // Collector
-    public static final int kCOLLECTOR = 4;
+    public static final int kP_COLLECTOR = 4;
 
     // Preferences
     public static final String kSHOOTER_KEY = "SHOOTER";

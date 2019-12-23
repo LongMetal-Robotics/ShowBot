@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class Input {
     private int leftStickPortInit, rightStickPortInit;
-    public Joystick forwardStick, turnStick;
+    public Joystick forwardStick, turnStick, gamepad;
     private boolean isQuinnDrive = false;
 
-    public Input(int leftStickPortInit, int rightStickPortInit) {
-        this.leftStickPortInit = leftStickPortInit;
-        this.rightStickPortInit = rightStickPortInit;
+    public Input() {
+        leftStickPortInit = Constants.kP_LEFT_STICK;
+        rightStickPortInit = Constants.kP_RIGHT_STICK;
         forwardStick = new Joystick(leftStickPortInit);
         turnStick = new Joystick(rightStickPortInit);
+        gamepad = new Joystick(Constants.kP_GAMEPAD);
     }
 
     public void setQuinnDrive(boolean doIt) {

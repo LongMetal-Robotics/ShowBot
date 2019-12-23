@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Preferences;
 
 import org.longmetal.Arduino.Status;
 import org.longmetal.*;
+import org.longmetal.util.Listener;
 
 public class Robot extends TimedRobot {
     private static final String DEPRECATION = "deprecation";
@@ -25,31 +26,29 @@ public class Robot extends TimedRobot {
 
     SendableChooser<Boolean> chooserQuinnDrive;
 
-    boolean preferenceShooter;
-    boolean preferenceManipulator;
-    boolean lastQuinnDrive = false;
-    boolean lastForwardDrive = false;
-    boolean lastReverseDrive = false;
+    Listener QuinnDrive;
+    Listener forwardDrive;
+    Listener reverseDrive;
 
     @Override
     @SuppressWarnings(DEPRECATION)
     public void robotInit() {
-        try {
-            File file = new File(Filesystem.getDeployDirectory(), "branch.txt");
+        try {   // Automatic, Git-based Version Tracking
+            File file = new File(Filesystem.getDeployDirectory(), "branch.txt");    // Open the file that contains the current branch
             Scanner fs = new Scanner(file);
             String branch = "unknown",
                 commit = "unknown";
 
             if (fs.hasNextLine()) {
-                branch = fs.nextLine();
+                branch = fs.nextLine(); // Read the current branch from file
             }
 
-            file = new File(Filesystem.getDeployDirectory(), "commit.txt");
+            file = new File(Filesystem.getDeployDirectory(), "commit.txt"); // Open the file that contains the current commit
             fs.close();
             fs = new Scanner(file);
 
             if (fs.hasNextLine()) {
-                commit = fs.nextLine();
+                commit = fs.nextLine(); // Read the current commit from file
             }
 
             System.out.println("Commit " + commit + " or later (branch '" + branch + "')");
@@ -59,7 +58,7 @@ public class Robot extends TimedRobot {
             e.printStackTrace();
         }
 
-        input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
+        input = new Input();
         driveTrain = new DriveTrain();
         status = new Arduino();
         currentStatus = Status.DISABLED;
@@ -68,51 +67,45 @@ public class Robot extends TimedRobot {
         shooter = new Shooter();
         collector = new Collector();
 
+        QuinnDrive = new Listener(/* onTrue */ new Runnable(){ public void run() { input.setQuinnDrive(true); } },
+            /* onFalse */ new Runnable(){ public void run() { input.setQuinnDrive(false); } });
+
         chooserQuinnDrive = new SendableChooser<>();
         chooserQuinnDrive.addDefault("Disabled", false);
         chooserQuinnDrive.addObject("Enabled", true);
         SmartDashboard.putData("Quinn Drive Chooser", chooserQuinnDrive);
 
-        //here are the booleans for if the shooter and manipulator should be running from outset
-        //the backup for if something isn't working right is false
-        
-        preferenceShooter = prefs.getBoolean("preferenceShooter", false);
-        preferenceManipulator = prefs.getBoolean("preferenceManipulator", false);
+        forwardDrive = new Listener(new Runnable(){ // This looks like a really janky way to do it but it should work well
+            public void run() { // Forward
+                driveTrain.setReverseDrive(false);
+                if (status.isReady()) {
+                    status.sendStatus(Status.FORWARD);
+                }
+            }
+        }, new Runnable(){
+            public void run() { // Reverse
+                driveTrain.setReverseDrive(true);
+                if (status.isReady()) {
+                    status.sendStatus(Status.BACKWARD);
+                }
+            }
+        });
 
     }
     
     @Override
     public void robotPeriodic() {
         SmartDashboard.putData("Drive Train", driveTrain.driveTrain);
+        QuinnDrive.update(chooserQuinnDrive.getSelected());
         SmartDashboard.putBoolean("Quinn Drive", input.isQuinnDrive());
-        boolean quinnDrive = (Boolean)chooserQuinnDrive.getSelected();
-        if (quinnDrive != lastQuinnDrive) {
-            input.setQuinnDrive(quinnDrive);
-        }
-        lastQuinnDrive = quinnDrive;
-
         // Reverse Drive mode
 
-        boolean forwardDrive = input.forwardStick.getRawButtonPressed(Constants.kFORWARD_BUTTON);
-        boolean reverseDrive = input.forwardStick.getRawButton(Constants.kREVERSE_BUTTON);
+        boolean forwardDriveVal = input.forwardStick.getRawButtonPressed(Constants.kFORWARD_BUTTON);
+        boolean reverseDriveVal = input.forwardStick.getRawButton(Constants.kREVERSE_BUTTON);
 
-        if (forwardDrive && forwardDrive != lastForwardDrive && !reverseDrive) { // If it is pressed and it changed and both aren't pressed
-            // Set forward drive
-            driveTrain.setReverseDrive(false);
-            if (status.isReady()) {
-                status.sendStatus(Status.FORWARD);
-            }
+        if (!(forwardDriveVal && reverseDriveVal) || (!forwardDriveVal && !reverseDriveVal)) {  // One or the other
+            forwardDrive.update(forwardDriveVal);   // If this is false the other must be true so this works
         }
-        lastForwardDrive = forwardDrive;
-
-        if (reverseDrive && reverseDrive != lastReverseDrive && !forwardDrive) { // If it is pressed and it changed and both aren't pressed
-            // Set reverse drive
-            driveTrain.setReverseDrive(true);
-	        if (status.isReady()) {
-                status.sendStatus(Status.BACKWARD);
-            }
-        }
-        lastReverseDrive = reverseDrive;
 
         SmartDashboard.putBoolean("Reverse Drive", driveTrain.getReverseDrive());
     }

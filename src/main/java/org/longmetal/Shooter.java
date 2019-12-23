@@ -30,9 +30,9 @@ public class Shooter {
 
     public void init() {
         angle = new TalonSRX(Constants.kANGLE);
-        shooterL = new Spark(Constants.kL_SHOOTER);
-        shooterR = new Spark(Constants.kR_SHOOTER);
-        singulator = new Spark(Constants.kSINGULATOR);
+        shooterL = new Spark(Constants.kP_LSHOOTER);
+        shooterR = new Spark(Constants.kP_RSHOOTER);
+        singulator = new Spark(Constants.kP_SINGULATOR);
         initialized = true;
     }
 

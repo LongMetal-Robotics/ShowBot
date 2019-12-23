@@ -23,7 +23,7 @@ public class Collector {
     }
 
     public void init() {
-        collectorMotor = new Spark(Constants.kCOLLECTOR);
+        collectorMotor = new Spark(Constants.kP_COLLECTOR);
         initialized = true;
     }
 
