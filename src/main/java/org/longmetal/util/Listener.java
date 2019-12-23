@@ -36,9 +36,17 @@ public class Listener {
         if (oldValue != newValue) { // If the value changed
             somethingRan = true;
             if (newValue) { // If the new value is true
-                onTrue.run();
+                if (onTrue != null) {
+                    onTrue.run();
+                } else {
+                    somethingRan = false;
+                }
             } else {        // If the new value is false
-                onFalse.run();
+                if (onFalse != null) {
+                    onFalse.run();
+                } else {
+                    somethingRan = false;
+                }
             }
         }
         oldValue = newValue;    // Save the new value to compare the next time
