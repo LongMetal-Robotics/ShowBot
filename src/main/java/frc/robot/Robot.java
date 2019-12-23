@@ -18,6 +18,7 @@ public class Robot extends TimedRobot {
     Input input;
     DriveTrain driveTrain;
     Arduino status;
+    Status currentStatus;
     Shooter shooter;
     Collector collector;
     Preferences prefs;
@@ -61,6 +62,7 @@ public class Robot extends TimedRobot {
         input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
         driveTrain = new DriveTrain();
         status = new Arduino();
+        currentStatus = Status.DISABLED;
         prefs = Preferences.getInstance();
 
         shooter = new Shooter();
@@ -116,6 +118,11 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void disabledInit() {
+        currentStatus = Status.DISABLED;
+    }
+
+    @Override
     public void disabledPeriodic() {
         if (status.isReady()) {
             status.sendStatus(Status.DISABLED);
@@ -123,14 +130,27 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void teleopInit() {
+        currentStatus = Status.ENABLED;
+    }
+
+    @Override
     public void teleopPeriodic() {
         if (status.isReady()) {
-            status.sendStatus(Status.ENABLED);
+            if (shooter.isShooting()) {
+                status.sendStatus(Status.SHOOTING);
+            } else {
+                status.sendStatus(Status.ENABLED);
+            }
         }
 
         driveTrain.curve(input.forwardStick.getY(),
             input.forwardStick.getThrottle(),
             input.turnStick.getTwist(),
             input.turnStick.getThrottle());
+    }
+
+    public Arduino.Status currentStatus() {
+        return currentStatus;
     }
 }

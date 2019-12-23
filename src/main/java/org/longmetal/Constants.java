@@ -20,4 +20,21 @@ public class Constants {
     
     // Communication
     public static final int kSERIAL_BAUD_RATE = 9600;
+
+    // Shooter
+    public static final int kANGLE = 5;
+    public static final int kL_SHOOTER = 1;
+    public static final int kR_SHOOTER = 2;
+    public static final double kSHOOTER_MIN = 0.1;
+    public static final double kSHOOTER_MAX = 0.75;
+    public static final int kSINGULATOR = 3;
+    public static final double kSINGULATOR_MIN = 0;
+    public static final double kSINGULATOR_MAX = 0.5;
+
+    // Collector
+    public static final int kCOLLECTOR = 4;
+
+    // Preferences
+    public static final String kSHOOTER_KEY = "SHOOTER";
+    public static final String kCOLLECTOR_KEY = "COLLECTOR";
 }
