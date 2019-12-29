@@ -24,16 +24,16 @@ public class Constants {
 
     // Shooter
     public static final int kANGLE = 5;
-    public static final int kP_LSHOOTER = 1;
-    public static final int kP_RSHOOTER = 2;
+    public static final int kP_LSHOOTER = 0;
+    public static final int kP_RSHOOTER = 1;
     public static final double kSHOOTER_MIN = 0.1;
     public static final double kSHOOTER_MAX = 0.75;
-    public static final int kP_SINGULATOR = 3;
+    public static final int kP_SINGULATOR = 2;
     public static final double kSINGULATOR_MIN = 0;
     public static final double kSINGULATOR_MAX = 0.5;
 
     // Collector
-    public static final int kP_COLLECTOR = 4;
+    public static final int kP_COLLECTOR = 3;
 
     // Preferences
     public static final String kSHOOTER_KEY = "SHOOTER";
