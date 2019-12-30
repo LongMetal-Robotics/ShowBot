@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Preferences;
 
-import org.longmetal.Arduino.Status;
 import org.longmetal.*;
+import org.longmetal.Arduino.Status;
 import org.longmetal.util.Listener;
+import org.longmetal.exception.*;
 
 public class Robot extends TimedRobot {
     private static final String DEPRECATION = "deprecation";
@@ -19,16 +20,15 @@ public class Robot extends TimedRobot {
     Input input;
     DriveTrain driveTrain;
     Arduino status;
-    Status currentStatus;
     Shooter shooter;
     Collector collector;
     Preferences prefs;
+    SubsystemManager subsystemManager;
 
     SendableChooser<Boolean> chooserQuinnDrive;
 
     Listener QuinnDrive;
     Listener forwardDrive;
-    Listener reverseDrive;
 
     @Override
     @SuppressWarnings(DEPRECATION)
@@ -62,12 +62,13 @@ public class Robot extends TimedRobot {
 
         input = new Input();
         driveTrain = new DriveTrain();
+        driveTrain.setReverseDrive(true);   // Default to shooting mode
         status = new Arduino();
-        currentStatus = Status.DISABLED;
         prefs = Preferences.getInstance();
 
         shooter = new Shooter();
         collector = new Collector();
+        subsystemManager = new SubsystemManager();
 
         QuinnDrive = new Listener(/* onTrue */ new Runnable(){ public void run() { input.setQuinnDrive(true); } },
             /* onFalse */ new Runnable(){ public void run() { input.setQuinnDrive(false); } });
@@ -80,19 +81,14 @@ public class Robot extends TimedRobot {
         forwardDrive = new Listener(new Runnable(){ // This looks like a really janky way to do it but it should work well
             public void run() { // Forward
                 driveTrain.setReverseDrive(false);
-                if (status.isReady()) {
-                    status.sendStatus(Status.FORWARD);
-                }
+                status.sendStatus(Status.FORWARD);
             }
         }, new Runnable(){
             public void run() { // Reverse
                 driveTrain.setReverseDrive(true);
-                if (status.isReady()) {
-                    status.sendStatus(Status.BACKWARD);
-                }
+                status.sendStatus(Status.BACKWARD);
             }
         });
-
     }
     
     @Override
@@ -110,42 +106,106 @@ public class Robot extends TimedRobot {
         }
 
         SmartDashboard.putBoolean("Reverse Drive", driveTrain.getReverseDrive());
+        subsystemManager.checkSendables();
     }
 
     @Override
     public void disabledInit() {
-        currentStatus = Status.DISABLED;
+        status.sendStatus(Status.DISABLED);
     }
 
-    @Override
-    public void disabledPeriodic() {
-        if (status.isReady()) {
-            status.sendStatus(Status.DISABLED);
+    private void sendStandardStatus() {
+        Status mode = Status.ENABLED;
+        if (driveTrain.getReverseDrive()) {
+            mode = Status.BACKWARD;
+        } else {
+            mode = Status.FORWARD;
         }
+        status.sendStatus(mode);
     }
 
     @Override
     public void teleopInit() {
-        currentStatus = Status.ENABLED;
+        sendStandardStatus();
     }
 
     @Override
     public void teleopPeriodic() {
-        if (status.isReady()) {
-            if (shooter.isShooting()) {
-                status.sendStatus(Status.SHOOTING);
-            } else {
-                status.sendStatus(Status.ENABLED);
-            }
-        }
 
         driveTrain.curve(input.forwardStick.getY(),
             input.forwardStick.getThrottle(),
             input.turnStick.getTwist(),
             input.turnStick.getThrottle());
+
+        double trigger = input.gamepad.getRawAxis(Constants.kA_TRIGGER);
+
+        String currentSubsystem = "Subsystem";
+        try {
+            if (driveTrain.getReverseDrive()) { // Shooting mode
+                System.out.println("Shooting mode");
+                currentSubsystem = "Shooter";
+                if (Shooter.getEnabled()) {
+                    double modifierX = input.gamepad.getRawAxis(Constants.kA_LS_X);
+                    double modifierY = input.gamepad.getRawAxis(Constants.kA_LS_Y) * Constants.kY_AXIS_MODIFIER;
+
+                    shooter.modifier(modifierX, modifierY); // Set shooter modifiers
+                    System.out.println("Shooter modifiers: (" + modifierX + ", " + modifierY + ")");
+                    if (trigger > Constants.kINPUT_DEADBAND) {    // Right trigger has passed deadband
+                        System.out.println("Trigger past deadband (value: " + trigger + ")");
+                        status.sendStatus(Status.SHOOTING);
+                        shooter.run(trigger);
+                    } else {
+                        System.out.println("Trigger in deadband");
+                        sendStandardStatus();
+                        shooter.idle();
+                    }
+
+                    double angleSpeed = input.gamepad.getRawAxis(Constants.kA_RS_Y) * Constants.kY_AXIS_MODIFIER;
+                    shooter.angleSpeed(angleSpeed * Constants.kANGLE_SPEED_MODIFIER);
+                    System.out.println("Angle Speed: " + (angleSpeed * Constants.kANGLE_SPEED_MODIFIER));
+                }
+
+                currentSubsystem = "Collector";
+                if (Collector.getEnabled()) {
+                    collector.setMotor(0);
+                }
+            } else {    // Collecting mode
+                System.out.println("Collecting mode");
+                currentSubsystem = "Collector";
+                if (Collector.getEnabled()) {
+                    if (trigger > Constants.kINPUT_DEADBAND) {
+                        System.out.println("Trigger past deadband (value: " + trigger + ")");
+                        status.sendStatus(Status.SHOOTING);
+                        collector.setMotor(trigger);
+                    } else {
+                        System.out.println("Trigger in deadband");
+                        sendStandardStatus();
+                        collector.setMotor(0);
+                    }
+                }
+
+                currentSubsystem = "Shooter";
+                if (Shooter.getEnabled()) {
+                    shooter.modifier(0, 0); // Clear shooter modifiers
+                    shooter.idle();
+                }
+            }
+
+
+        } catch (SubsystemException e) {
+            status.sendStatus(Status.PROBLEM);
+            System.out.println(currentSubsystem + " Problem: " + problemName(e) + ". Stack Trace:");
+            e.printStackTrace();
+        }
     }
 
-    public Arduino.Status currentStatus() {
-        return currentStatus;
+    private String problemName(SubsystemException e) {
+        if (e.getClass().isInstance(SubsystemDisabledException.class)) {
+            return "Subsystem Disabled";
+        } else if (e.getClass().isInstance(SubsystemUninitializedException.class)) {
+            return "Subsystem Unitialized";
+        } else {
+            return "Generic Subsystem Problem";
+        }
     }
 }

@@ -46,7 +46,7 @@ public class Collector {
         enabled = newEnabled;
     }
 
-    public boolean getEnabled() {
+    public static boolean getEnabled() {
         return enabled;
     }
 }

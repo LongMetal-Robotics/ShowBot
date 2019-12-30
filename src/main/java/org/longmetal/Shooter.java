@@ -14,6 +14,8 @@ public class Shooter {
     private static boolean enabled = true;
     private boolean initialized = false;
     private boolean shooting = false;
+    private double modifierX = 0;
+    private double modifierY = 0;
 
     public Shooter() {
         this(true);
@@ -29,7 +31,7 @@ public class Shooter {
     }
 
     public void init() {
-        angle = new TalonSRX(Constants.kANGLE);
+        angle = new TalonSRX(Constants.kP_ANGLE);
         shooterL = new Spark(Constants.kP_LSHOOTER);
         shooterR = new Spark(Constants.kP_RSHOOTER);
         singulator = new Spark(Constants.kP_SINGULATOR);
@@ -53,15 +55,35 @@ public class Shooter {
         return shooting;
     }
 
+    public void modifier(double modifierX, double modifierY) {
+        this.modifierX = modifierX;
+        this.modifierY = modifierY;
+    }
+
     public void run(double speed) throws SubsystemException {
+        run(speed, true);
+    }
+
+    public void run(double speed, boolean runSingulator) throws SubsystemException {
         SubsystemManager.check(enabled, initialized);
+        if (runSingulator) {
+            singulator.set(speed);
+        }
+        speed *= Constants.kSHOOTER_SPEED_MODIFIER;
+        double xModifier = modifierX * Constants.kSHOOTER_X_MODIFIER;
+        double yModifier = modifierY * Constants.kSHOOTER_Y_MODIFIER;
+        shooterL.set((double)Math.limit(speed - xModifier + yModifier, Constants.kSHOOTER_MIN, Constants.kSHOOTER_MAX));
+        shooterR.set((double)Math.limit(speed + xModifier + yModifier, Constants.kSHOOTER_MIN, Constants.kSHOOTER_MAX));
     }
 
     public void idle() throws SubsystemException {
         SubsystemManager.check(enabled, initialized);
         singulator.set(0);
-        shooterL.set(Constants.kSHOOTER_MIN);
-        shooterR.set(Constants.kSHOOTER_MIN);
+        run(Constants.kSHOOTER_MIN, false);
+    }
+
+    public void angleSpeed(double speed) {
+        angle.set(ControlMode.PercentOutput, speed);
     }
 
     public void setEnabled(boolean newEnabled) {

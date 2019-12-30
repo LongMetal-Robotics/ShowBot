@@ -6,96 +6,83 @@ import org.longmetal.exception.SubsystemUninitializedException;
 
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SubsystemManager {
+    private SendableChooser<Runnable> shooterEnable;
+    private SendableChooser<Runnable> collectorEnable;
 
     public SubsystemManager() {
         Preferences preferences = Preferences.getInstance();
         boolean shooterEnableValue = false;
         boolean collectorEnableValue = false;
 
-        if (preferences.containsKey(Constants.kSHOOTER_KEY) /* Includes shooter data */
-          && preferences.getBoolean(Constants.kSHOOTER_KEY, false) /* Shooter disabled */) {
-            shooterEnableValue = true;
-        }
+        shooterEnableValue = preferences.getBoolean(Constants.kSHOOTER_KEY, false) /* Shooter enabled */;
 
-        SendableChooser<Runnable> shooterEnable = new SendableChooser<>();
-        if (shooterEnableValue) {    // (hopefully) set the order of the options in the menu so enabled is always first but the
+        Runnable enableShooter = new Runnable() {
+            
+            @Override
+            public void run() {
+                SubsystemManager.setSubsystem(Subsystem.SHOOTER, true);
+            }
+        };
+        Runnable disableShooter = new Runnable(){
+            
+            @Override
+            public void run() {
+                SubsystemManager.setSubsystem(Subsystem.SHOOTER, false);
+            }
+        };
+
+        shooterEnable = new SendableChooser<>();
+        if (shooterEnableValue) {   // (hopefully) set the order of the options in the menu so enabled is always first but the
                                     // initially selected option indicates whether the subsystem is actually enabled or not
                                     // based on previously-saved preferences
-            shooterEnable.setDefaultOption("Enabled", new Runnable() {
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.SHOOTER, true);
-                }
-            });
-            shooterEnable.addOption("Disabled", new Runnable(){
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.SHOOTER, false);
-                }
-            });
+            shooterEnable.setDefaultOption(Constants.kENABLED, enableShooter);
+            shooterEnable.addOption(Constants.kDISABLED, disableShooter);
         } else {
-            shooterEnable.addOption("Enabled", new Runnable(){
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.SHOOTER, true);
-                }
-            });
-            shooterEnable.setDefaultOption("Disabled", new Runnable() {
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.SHOOTER, false);
-                }
-            });
+            shooterEnable.addOption(Constants.kENABLED, enableShooter);
+            shooterEnable.setDefaultOption(Constants.kDISABLED, disableShooter);
         }
+        SmartDashboard.putData(Constants.kSHOOTER_ENABLER_KEY, shooterEnable);
 
         setSubsystem(Subsystem.SHOOTER, shooterEnableValue);
 
 
-        if (preferences.containsKey(Constants.kCOLLECTOR_KEY) /* Includes collector data */
-          && preferences.getBoolean(Constants.kCOLLECTOR_KEY, false) /* Shooter disabled */) {
-            collectorEnableValue = true;
-        }
+        collectorEnableValue = preferences.getBoolean(Constants.kCOLLECTOR_KEY, false) /* Collector enabled */;
 
-        SendableChooser<Runnable> collectorEnable = new SendableChooser<>();
+        Runnable enableCollector = new Runnable() {
+            
+            @Override
+            public void run() {
+                SubsystemManager.setSubsystem(Subsystem.COLLECTOR, true);
+            }
+        };
+
+        Runnable disableCollector = new Runnable(){
+            
+            @Override
+            public void run() {
+                SubsystemManager.setSubsystem(Subsystem.COLLECTOR, false);
+            }
+        };
+
+        collectorEnable = new SendableChooser<>();
         if (collectorEnableValue) {
-            collectorEnable.setDefaultOption("Enabled", new Runnable() {
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.COLLECTOR, true);
-                }
-            });
-            collectorEnable.addOption("Disabled", new Runnable(){
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.COLLECTOR, false);
-                }
-            });
+            collectorEnable.setDefaultOption(Constants.kENABLED, enableCollector);
+            collectorEnable.addOption(Constants.kDISABLED, disableCollector );
         } else {
-            collectorEnable.addOption("Enabled", new Runnable(){
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.COLLECTOR, true);
-                }
-            });
-            collectorEnable.setDefaultOption("Disabled", new Runnable() {
-            
-                @Override
-                public void run() {
-                    SubsystemManager.setSubsystem(Subsystem.COLLECTOR, false);
-                }
-            });
+            collectorEnable.addOption(Constants.kENABLED, enableCollector);
+            collectorEnable.setDefaultOption(Constants.kDISABLED, disableCollector);
         }
+        SmartDashboard.putData(Constants.kCOLLECTOR_ENABLER_KEY, collectorEnable);
         
         setSubsystem(Subsystem.COLLECTOR, collectorEnableValue);
+    }
+
+    public void checkSendables() {
+        shooterEnable.getSelected().run();
+        collectorEnable.getSelected().run();
     }
 
     public static void setSubsystem(Subsystem subsystem, boolean enabled) {
@@ -104,11 +91,13 @@ public class SubsystemManager {
             case SHOOTER:
                 Shooter.staticSetEnabled(enabled);
                 preferences.putBoolean(Constants.kSHOOTER_KEY, enabled);
+                SmartDashboard.putBoolean(Constants.kSHOOTER_STATE_KEY, enabled);
                 break;
 
             case COLLECTOR:
                 Collector.staticSetEnabled(enabled);
                 preferences.putBoolean(Constants.kCOLLECTOR_KEY, enabled);
+                SmartDashboard.putBoolean(Constants.kCOLLECTOR_STATE_KEY, enabled);
                 break;
         }
     }
