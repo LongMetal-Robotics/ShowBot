@@ -142,27 +142,22 @@ public class Robot extends TimedRobot {
         String currentSubsystem = "Subsystem";
         try {
             if (driveTrain.getReverseDrive()) { // Shooting mode
-                System.out.println("Shooting mode");
                 currentSubsystem = "Shooter";
                 if (Shooter.getEnabled()) {
                     double modifierX = input.gamepad.getRawAxis(Constants.kA_LS_X);
                     double modifierY = input.gamepad.getRawAxis(Constants.kA_LS_Y) * Constants.kY_AXIS_MODIFIER;
 
                     shooter.modifier(modifierX, modifierY); // Set shooter modifiers
-                    System.out.println("Shooter modifiers: (" + modifierX + ", " + modifierY + ")");
                     if (trigger > Constants.kINPUT_DEADBAND) {    // Right trigger has passed deadband
-                        System.out.println("Trigger past deadband (value: " + trigger + ")");
                         status.sendStatus(Status.SHOOTING);
                         shooter.run(trigger);
                     } else {
-                        System.out.println("Trigger in deadband");
                         sendStandardStatus();
                         shooter.idle();
                     }
 
                     double angleSpeed = input.gamepad.getRawAxis(Constants.kA_RS_Y) * Constants.kY_AXIS_MODIFIER;
                     shooter.angleSpeed(angleSpeed * Constants.kANGLE_SPEED_MODIFIER);
-                    System.out.println("Angle Speed: " + (angleSpeed * Constants.kANGLE_SPEED_MODIFIER));
                 }
 
                 currentSubsystem = "Collector";
@@ -170,15 +165,12 @@ public class Robot extends TimedRobot {
                     collector.setMotor(0);
                 }
             } else {    // Collecting mode
-                System.out.println("Collecting mode");
                 currentSubsystem = "Collector";
                 if (Collector.getEnabled()) {
                     if (trigger > Constants.kINPUT_DEADBAND) {
-                        System.out.println("Trigger past deadband (value: " + trigger + ")");
                         status.sendStatus(Status.SHOOTING);
                         collector.setMotor(trigger);
                     } else {
-                        System.out.println("Trigger in deadband");
                         sendStandardStatus();
                         collector.setMotor(0);
                     }

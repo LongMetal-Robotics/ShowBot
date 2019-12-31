@@ -45,12 +45,13 @@ public class SubsystemManager {
             shooterEnable.setDefaultOption(Constants.kDISABLED, disableShooter);
         }
         SmartDashboard.putData(Constants.kSHOOTER_ENABLER_KEY, shooterEnable);
+        SmartDashboard.putBoolean(Constants.kSHOOTER_STATE_KEY, shooterEnableValue);
 
         setSubsystem(Subsystem.SHOOTER, shooterEnableValue);
 
 
         collectorEnableValue = preferences.getBoolean(Constants.kCOLLECTOR_KEY, false) /* Collector enabled */;
-
+        
         Runnable enableCollector = new Runnable() {
             
             @Override
@@ -76,6 +77,7 @@ public class SubsystemManager {
             collectorEnable.setDefaultOption(Constants.kDISABLED, disableCollector);
         }
         SmartDashboard.putData(Constants.kCOLLECTOR_ENABLER_KEY, collectorEnable);
+        SmartDashboard.putBoolean(Constants.kCOLLECTOR_STATE_KEY, collectorEnableValue);
         
         setSubsystem(Subsystem.COLLECTOR, collectorEnableValue);
     }
