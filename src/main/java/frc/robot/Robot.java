@@ -196,6 +196,17 @@ public class Robot extends TimedRobot {
             status.sendStatus(Status.PROBLEM);
             System.out.println(currentSubsystem + " Problem: " + problemName(e) + ". Stack Trace:");
             e.printStackTrace();
+
+            boolean isUninitialized = e.getClass().isInstance(SubsystemUninitializedException.class);
+            if (currentSubsystem.equals("Shooter")
+                && Shooter.getEnabled() && isUninitialized) {
+
+                shooter.init();
+            } else if (currentSubsystem.equals("Collector")
+                && Collector.getEnabled() && isUninitialized) {
+                    
+                collector.init();
+            }
         }
     }
 
