@@ -43,9 +43,20 @@ void loop() {
       for (int i = 0; i < LED_COUNT; i += 2) {
         strip.setPixelColor(i, RSL_R, RSL_G, RSL_B);
       }
+      
+      if (stat == 'p') {
+        for (int i = 1; i < LED_COUNT; i += 2) {
+          strip.setPixelColor(i, 0, 0, 0);
+        }
+      }
     } else {
       for (int i = 0; i < LED_COUNT; i += 2) {
         strip.setPixelColor(i, 0, 0, 0);
+      }
+      if (stat == 'p') {
+        for (int i = 1; i < LED_COUNT; i += 2) {
+          strip.setPixelColor(i, STATUS_LUM, 0, 0);
+        }
       }
     }
     if (stat == 'f') {
@@ -87,6 +98,10 @@ void receiveEvent() {
 
       case 83: // 'S'HOOTING
         stat = 's';
+        break;
+
+      case 80: // 'P'ROBLEM
+        stat = 'p';
         break;
 
       default:
