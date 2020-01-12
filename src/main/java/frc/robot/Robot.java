@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
     SubsystemManager subsystemManager;
 
     SendableChooser<Boolean> chooserQuinnDrive;
+    SendableChooser<Double> speedChooser;
 
     Listener QuinnDrive;
     Listener forwardDrive;
@@ -89,6 +90,13 @@ public class Robot extends TimedRobot {
                 status.sendStatus(Status.BACKWARD);
             }
         });
+
+        speedChooser = new SendableChooser<>();
+        speedChooser.addOption("Safe", 0.33);
+        speedChooser.addDefault("Normal", 0.5);
+        speedChooser.addOption("Mad Max", 0.75);
+        speedChooser.addOption("Dangerous", 1.0);
+        SmartDashboard.putData("Speed Chooser", speedChooser);
     }
     
     @Override
@@ -107,6 +115,9 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putBoolean("Reverse Drive", driveTrain.getReverseDrive());
         subsystemManager.checkSendables();
+
+        driveTrain.setMaxSpeed(speedChooser.getSelected());
+        SmartDashboard.putNumber("Speed", driveTrain.getMaxSpeed());
     }
 
     @Override
