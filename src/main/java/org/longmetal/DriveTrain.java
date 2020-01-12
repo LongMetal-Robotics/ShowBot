@@ -19,15 +19,15 @@ public class DriveTrain {
     private boolean reverseDrive = false;
 
     public DriveTrain() {
-        mRearLeft = new CANSparkMax(Constants.kREAR_LEFT, MotorType.kBrushless);
+        mRearLeft = new CANSparkMax(Constants.kP_REAR_LEFT, MotorType.kBrushless);
         mRearLeft.setIdleMode(IdleMode.kCoast);
-        mFrontLeft = new CANSparkMax(Constants.kFRONT_LEFT, MotorType.kBrushless);
+        mFrontLeft = new CANSparkMax(Constants.kP_FRONT_LEFT, MotorType.kBrushless);
         mFrontLeft.setIdleMode(IdleMode.kCoast);
         leftMotors = new SpeedControllerGroup(mRearLeft, mFrontLeft);
 
-        mRearRight = new CANSparkMax(Constants.kREAR_RIGHT, MotorType.kBrushless);
+        mRearRight = new CANSparkMax(Constants.kP_REAR_RIGHT, MotorType.kBrushless);
         mRearRight.setIdleMode(IdleMode.kCoast);
-        mFrontRight = new CANSparkMax(Constants.kFRONT_RIGHT, MotorType.kBrushless);
+        mFrontRight = new CANSparkMax(Constants.kP_FRONT_RIGHT, MotorType.kBrushless);
         mFrontRight.setIdleMode(IdleMode.kCoast);
         rightMotors = new SpeedControllerGroup(mRearRight, mFrontRight);
 

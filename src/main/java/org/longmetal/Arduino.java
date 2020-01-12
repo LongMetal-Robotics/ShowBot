@@ -4,21 +4,20 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
 public class Arduino {
-    SerialPort port;
-    byte[] toSend = new byte[1];
-    boolean ready = false;
+    private SerialPort port;
+    private byte[] toSend = new byte[1];
 
+    /**
+     * Initialize communication with the Arduino
+     */
     public Arduino() {
-        try {
-            port = new SerialPort(Constants.kSERIAL_BAUD_RATE, Port.kUSB);
-            ready = true;
-        } catch (Exception e) {
-            System.out.println("[SERIAL:INIT]\tSomething went wrong with Serial initialization. Stack trace and message are below");
-            System.out.println(e.getLocalizedMessage());
-            e.printStackTrace();
-        }
+        port = new SerialPort(Constants.kSERIAL_BAUD_RATE, Port.kUSB);
     }
 
+    /**
+     * Send a status to the Arduino. The status is sent as a single character (ASCII)
+     * @param status The status to send
+     */
     public void sendStatus(Status status) {
         switch (status) {
             case ENABLED:
@@ -40,17 +39,17 @@ public class Arduino {
             case SHOOTING:
                 toSend[0] = 83; // S
                 break;
+
+            case PROBLEM:
+                toSend[0] = 80; // P
+                break;
             
             default:
                 toSend[0] = 0;  // NUL
                 return;
         }
 
-        port.write(toSend, 1);
-    }
-
-    public boolean isReady() {
-        return ready;
+        port.write(toSend, 1);  // Send the data to the Arduino
     }
 
 
@@ -59,6 +58,7 @@ public class Arduino {
         DISABLED,
         FORWARD,
         BACKWARD,
-        SHOOTING
+        SHOOTING,
+        PROBLEM
     }
 }
