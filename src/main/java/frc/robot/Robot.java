@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
         boolean forwardDriveVal = input.forwardStick.getRawButtonPressed(Constants.kFORWARD_BUTTON);
         boolean reverseDriveVal = input.forwardStick.getRawButton(Constants.kREVERSE_BUTTON);
 
-        if (!(forwardDriveVal && reverseDriveVal) || (!forwardDriveVal && !reverseDriveVal)) {  // One or the other
+        if (!(forwardDriveVal && reverseDriveVal) && (forwardDriveVal || reverseDriveVal)) {  // One or the other
             forwardDrive.update(forwardDriveVal);   // If this is false the other must be true so this works
         }
 
