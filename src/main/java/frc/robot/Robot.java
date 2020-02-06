@@ -3,16 +3,27 @@ package frc.robot;
 import java.io.File;
 import java.util.Scanner;
 
+import org.longmetal.Arduino;
+import org.longmetal.Arduino.Status;
+import org.longmetal.Constants;
+import org.longmetal.DriveTrain;
+import org.longmetal.Input;
+import org.longmetal.Shooter;
+import org.longmetal.SubsystemManager;
+import org.longmetal.Collector;
+import org.longmetal.exception.SubsystemDisabledException;
+import org.longmetal.exception.SubsystemException;
+import org.longmetal.exception.SubsystemUninitializedException;
+import org.longmetal.util.Listener;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Preferences;
-
-import org.longmetal.*;
-import org.longmetal.Arduino.Status;
-import org.longmetal.util.Listener;
-import org.longmetal.exception.*;
 
 public class Robot extends TimedRobot {
     private static final String DEPRECATION = "deprecation";
@@ -20,9 +31,9 @@ public class Robot extends TimedRobot {
     Input input;
     DriveTrain driveTrain;
     Arduino status;
+    Preferences prefs;
     Shooter shooter;
     Collector collector;
-    Preferences prefs;
     SubsystemManager subsystemManager;
 
     SendableChooser<Boolean> chooserQuinnDrive;
@@ -30,6 +41,12 @@ public class Robot extends TimedRobot {
 
     Listener QuinnDrive;
     Listener forwardDrive;
+
+    NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = limelightTable.getEntry("tx");
+    NetworkTableEntry ty = limelightTable.getEntry("ty");
+
+    double tX, tY;
 
     @Override
     @SuppressWarnings(DEPRECATION)
@@ -95,7 +112,7 @@ public class Robot extends TimedRobot {
         speedChooser.addOption("Safe", 0.33);
         speedChooser.addDefault("Normal", 0.5);
         speedChooser.addOption("Mad Max", 0.75);
-        speedChooser.addOption("Dangerous", 1.0);
+        speedChooser.addOption("Plaid", 1.0);
         SmartDashboard.putData("Speed Chooser", speedChooser);
     }
     
@@ -118,6 +135,12 @@ public class Robot extends TimedRobot {
 
         driveTrain.setMaxSpeed(speedChooser.getSelected());
         SmartDashboard.putNumber("Speed", driveTrain.getMaxSpeed());
+
+        tX = tx.getDouble(0.0);
+        tY = ty.getDouble(0.0);
+
+        SmartDashboard.putNumber("LimelightX", tX);
+        SmartDashboard.putNumber("LimelightY", tY);
     }
 
     @Override
@@ -143,10 +166,16 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        driveTrain.curve(input.forwardStick.getY(),
-            input.forwardStick.getThrottle(),
-            input.turnStick.getTwist(),
-            input.turnStick.getThrottle());
+        if (input.forwardStick.getRawButton(1)) {
+            limelightTable.putNumber("ledMode", 3.0);
+            limelightTable.putNumber("camMode", 0.0);
+            driveTrain.curveRaw(0, (tX / 30) / 2, true);
+        } else {
+            driveTrain.curve(input.forwardStick.getY(),
+                input.forwardStick.getThrottle(),
+                input.turnStick.getTwist(),
+                input.turnStick.getThrottle());
+        }
 
         double trigger = input.gamepad.getRawAxis(Constants.kA_TRIGGER);
 
