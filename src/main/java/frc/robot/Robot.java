@@ -9,17 +9,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.longmetal.Input;
-import org.longmetal.Arduino.Status;
+//import org.longmetal.Arduino.Status;
 import org.longmetal.DriveTrain;
 import org.longmetal.Constants;
-import org.longmetal.Arduino;
+//import org.longmetal.Arduino;
 
 public class Robot extends TimedRobot {
     private static final String DEPRECATION = "deprecation";
 
     Input input;
     DriveTrain driveTrain;
-    Arduino status;
+    //Arduino status;
 
     SendableChooser<Boolean> chooserQuinnDrive;
 
@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
 
         input = new Input(Constants.kLEFT_STICK, Constants.kRIGHT_STICK);
         driveTrain = new DriveTrain();
-        status = new Arduino();
+        //status = new Arduino();
 
         chooserQuinnDrive = new SendableChooser<>();
         chooserQuinnDrive.addDefault("Disabled", false);
@@ -83,18 +83,18 @@ public class Robot extends TimedRobot {
         if (forwardDrive && forwardDrive != lastForwardDrive && !reverseDrive) { // If it is pressed and it changed and both aren't pressed
             // Set forward drive
             driveTrain.setReverseDrive(false);
-            if (status.isReady()) {
+            /*if (status.isReady()) {
                 status.sendStatus(Status.FORWARD);
-            }
+            }*/
         }
         lastForwardDrive = forwardDrive;
 
         if (reverseDrive && reverseDrive != lastReverseDrive && !forwardDrive) { // If it is pressed and it changed and both aren't pressed
             // Set reverse drive
             driveTrain.setReverseDrive(true);
-	        if (status.isReady()) {
+	        /*if (status.isReady()) {
                 status.sendStatus(Status.BACKWARD);
-            }
+            }*/
         }
         lastReverseDrive = reverseDrive;
 
@@ -103,16 +103,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        if (status.isReady()) {
+        /*if (status.isReady()) {
             status.sendStatus(Status.DISABLED);
-        }
+        }*/
     }
 
     @Override
     public void teleopPeriodic() {
-        if (status.isReady()) {
+        /*if (status.isReady()) {
             status.sendStatus(Status.ENABLED);
-        }
+        }*/
 
         driveTrain.curve(input.forwardStick.getY(),
             input.forwardStick.getThrottle(),
